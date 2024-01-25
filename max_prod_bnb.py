@@ -1,3 +1,5 @@
+import numpy as np
+
 NUM_OF_PLAYERS = 2
 ITEM_NUM_INDEX = NUM_OF_PLAYERS
 PLAYER_ONE = 0
@@ -26,7 +28,7 @@ def calc_pessimitic_bound(state, num_of_items, valuations, pessamistic_bound):
             ans[PLAYER_ONE] += valuations[PLAYER_ONE][i]
         else:
             ans[PLAYER_TWO] += valuations[PLAYER_TWO][i]
-    pessamistic_bound = max(pessamistic_bound, min(ans))
+    pessamistic_bound = max(pessamistic_bound, np.prod(ans))
     return pessamistic_bound
 
 def calc_optimistic_bound(state, num_of_items, valuations):
@@ -35,7 +37,7 @@ def calc_optimistic_bound(state, num_of_items, valuations):
     for i in range(items_allocated, num_of_items):    
         ans[PLAYER_ONE] += valuations[PLAYER_ONE][i]
         ans[PLAYER_TWO] += valuations[PLAYER_TWO][i]
-    return min(ans)
+    return np.prod(ans)
 
 def prune(queue, visited, pessamistic_bound, state, num_of_items, valuations):
     pessamistic_bound = calc_pessimitic_bound(state, num_of_items, valuations, pessamistic_bound)
@@ -55,7 +57,7 @@ def branch_and_bound(root: list[list[int]], valuations: list[list[int]]):
         state = queue.pop(0)
         item_num = state[0][ITEM_NUM_INDEX]
         if item_num == len(valuations[0]): # is goal state
-            if min(ans[0][:-1]) < min(state[0][:-1]):
+            if np.prod(ans[0][:-1]) < np.prod(state[0][:-1]):
                 ans = state
             continue
         left = give_item_to_player(PLAYER_ONE, deep_copy(state), valuations, item_num)
