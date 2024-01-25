@@ -37,6 +37,13 @@ def calc_optimistic_bound(state, num_of_items, valuations):
         ans[PLAYER_TWO] += valuations[PLAYER_TWO][i]
     return min(ans)
 
+def prune(queue, visited, pessamistic_bound, state, num_of_items, valuations):
+    pessamistic_bound = calc_pessimitic_bound(state, num_of_items, valuations, pessamistic_bound)
+    if (get_key(state) not in visited) and (calc_optimistic_bound(state, num_of_items, valuations) >= pessamistic_bound): #pruning  
+        queue.append(state)
+        visited[get_key(state)] = 1
+    return pessamistic_bound
+    
 def branch_and_bound(root: list[list[int]], valuations: list[list[int]]):
     queue = []
     visited = {}
@@ -53,14 +60,8 @@ def branch_and_bound(root: list[list[int]], valuations: list[list[int]]):
             continue;
         left = give_item_to_player(PLAYER_ONE, deep_copy(state), valuations, item_num)
         right = give_item_to_player(PLAYER_TWO, deep_copy(state), valuations, item_num)
-        pessamistic_bound = calc_pessimitic_bound(left, num_of_items, valuations, pessamistic_bound)
-        if (get_key(left) not in visited) and (calc_optimistic_bound(left, num_of_items, valuations) >= pessamistic_bound): #pruning  
-            queue.append(left)
-            visited[get_key(left)] = 1
-        pessamistic_bound = calc_pessimitic_bound(right, num_of_items, valuations, pessamistic_bound)
-        if (get_key(right) not in visited) and (calc_optimistic_bound(right, num_of_items, valuations) >= pessamistic_bound): #pruning
-            queue.append(right)
-            visited[get_key(right)] = 1 
+        pessamistic_bound = prune(queue, visited, pessamistic_bound, left, num_of_items, valuations)
+        pessamistic_bound = prune(queue, visited, pessamistic_bound, right, num_of_items, valuations)
     return ans
 
 def egalitarion_allocation(valuations: list[list[int]]):
