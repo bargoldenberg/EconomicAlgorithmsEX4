@@ -1,3 +1,4 @@
+#IMPLEMENTED BY: BAR GOLDENBERG
 import numpy as np
 
 NUM_OF_PLAYERS = 2
