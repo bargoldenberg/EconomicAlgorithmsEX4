@@ -73,8 +73,5 @@ def egalitarion_allocation(valuations: list[list[int]]):
     print(f"player 0 takes items {', '.join([str(a + 1) for a in ans[1]])} with value {ans[0][PLAYER_ONE]}")
     print(f"player 1 takes items {', '.join([str(a + 1) for a in ans[2]])} with value {ans[0][PLAYER_TWO]}")
 
-#without pruning, loops = 63
-#without duplicates = 56
-#without duplicates and pessamistic/optimisitic bound checking = 26
 egalitarion_allocation([[4,5,6,7,8], [8,7,6,5,4]])
 
