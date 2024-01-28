@@ -38,13 +38,6 @@ def calc_optimistic_bound(state, num_of_items, valuations):
         ans[PLAYER_ONE] += valuations[PLAYER_ONE][i]
         ans[PLAYER_TWO] += valuations[PLAYER_TWO][i]
     return min(ans)
-
-def prune(queue, visited, pessamistic_bound, state, num_of_items, valuations):
-    pessamistic_bound = calc_pessimitic_bound(state, num_of_items, valuations, pessamistic_bound)
-    if (get_key(state) not in visited) and (calc_optimistic_bound(state, num_of_items, valuations) >= pessamistic_bound): #pruning  
-        queue.append(state)
-        visited[get_key(state)] = 1
-    return pessamistic_bound
     
 def branch_and_bound(root: list[list[int]], valuations: list[list[int]]):
     queue = []
@@ -56,14 +49,16 @@ def branch_and_bound(root: list[list[int]], valuations: list[list[int]]):
     while queue:
         state = queue.pop(0)
         item_num = state[0][ITEM_NUM_INDEX]
-        if item_num == len(valuations[0]): # is goal state
-            if min(ans[0][:-1]) < min(state[0][:-1]):
-                ans = state
-            continue
-        left = give_item_to_player(PLAYER_ONE, deep_copy(state), valuations, item_num)
-        right = give_item_to_player(PLAYER_TWO, deep_copy(state), valuations, item_num)
-        pessamistic_bound = prune(queue, visited, pessamistic_bound, left, num_of_items, valuations)
-        pessamistic_bound = prune(queue, visited, pessamistic_bound, right, num_of_items, valuations)
+        pessamistic_bound = calc_pessimitic_bound(state, num_of_items, valuations, pessamistic_bound)
+        if (get_key(state) not in visited) and (calc_optimistic_bound(state, num_of_items, valuations) >= pessamistic_bound): #pruning
+            if item_num == len(valuations[0]): # is goal state
+                if min(ans[0][:-1]) < min(state[0][:-1]):
+                    ans = state
+                continue
+            left = give_item_to_player(PLAYER_ONE, deep_copy(state), valuations, item_num)
+            right = give_item_to_player(PLAYER_TWO, deep_copy(state), valuations, item_num)
+            queue.append(left)
+            queue.append(right)
     return ans
 
 def egalitarion_allocation(valuations: list[list[int]]):
